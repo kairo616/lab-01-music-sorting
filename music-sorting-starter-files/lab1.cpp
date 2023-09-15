@@ -166,6 +166,9 @@ void MusicLibrary::get_options(int argc, char** argv) {
     */
     // use getopt to find command line options
     struct option longOpts[] = {{ "print", required_argument, nullptr, 'p' },
+                                { "name", no_argument, nullptr, 'n'},
+                                { "artist", no_argument, nullptr, 'a'},
+                                { "listens", no_argument, nullptr, 'l'},
                                 { "help", no_argument, nullptr, 'h' },
                                 { nullptr, 0, nullptr, '\0' }};
     
@@ -177,17 +180,20 @@ void MusicLibrary::get_options(int argc, char** argv) {
                 char, options with no_argument do not (help).
 
     */
-    while ((option = getopt_long(argc, argv, "p:h", longOpts, &option_index)) != -1) {
+    while ((option = getopt_long(argc, argv, "p:n:a:l:h", longOpts, &option_index)) != -1) {
         switch (option) {
             case 'p':
                 num_print = std::atoi(optarg);
                 break;
-
-            /*
-
-                TODO: Add the remaining cases and decide what to do when they occur.
-
-            */               
+            case 'n':
+                policy = 'n';
+                break;
+            case 'a':
+                policy = 'a';
+                break;
+            case 'l':
+                policy = 'l';
+                break;
 
             case 'h':
                 std::cout << "This program reads a CSV file that contains song names,\n"
@@ -303,6 +309,12 @@ void MusicLibrary::run() {
     // Determine our sorting policy and sort.
     if (policy == 'n') {
         std::sort(music.begin(), music.end(), Song::NameSort());
+    }
+    if (policy == 'a') {
+        std::sort(music.begin(), music.end(), Song::ArtistSort());
+    }
+    if (policy == 'l') {
+        std::sort(music.begin(), music.end(), Song::ListensSort());
     }
 
     /*
